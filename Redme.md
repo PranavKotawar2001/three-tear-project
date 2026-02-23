@@ -1,57 +1,92 @@
-# step by step three tear application deployment
+# Step-by-Step Three Tier Application Deployment
 
-### Deployment strategy
+## Deployment Strategy
 
-- Database **_ RDS (mysql) _**
-- Backend **_ Eks (K8S) _**
-- Frontend **_ S3 _**
+- Database : RDS (MySQL)
+- Backend : EKS (Kubernetes)
+- Frontend : S3 (Static Website)
 
-### Pre Requisit
+---
 
-- Terraform script for **_ RDS, EKS, S3 _**
-- Three ubuntu Ec2 instance **_ jenkins, Sonarqube and Terraform _**
+## Pre Requisites
 
-## take ssh a terraform instance with attach terraform IAM role
+- Terraform scripts for:
+  - RDS
+  - EKS
+  - S3
+- Three Ubuntu EC2 instances:
+  - Jenkins
+  - SonarQube
+  - Terraform
+- Terraform EC2 instance with IAM Role attached
 
-### Step 1:- Update a instance and install terraform
+---
 
-- update instance
+## Backend And Database Part
+
+## Launch Terraform EC2 Instance with IAM Role Attach
+
+- Take ssh
+
+### Step 1: Update Instance and Install Terraform
+
+#### Update Instance
 
 ```bash
-apy update
+sudo apt update -y
 ```
 
-- install terraform
+#### Install Terraform
 
 ```bash
 wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-sudo apt update && sudo apt install terraform
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install terraform -y
 ```
 
-step 2:- Insert your terraform script inside the terraform instance (pull it fron github if avalable or insert manueally)
+#### Verify Terraform Installation
 
-step 3:- run terraform resources
+```bash
+terraform version
+```
 
-- initilise terradorm resources
+### Step 2: Add Terraform Code
+
+- Pull Terraform code from GitHub or
+- Create Terraform files manually inside the instance
+
+```bash
+git clone <terraform-repo-url>
+cd <terraform-folder>
+```
+
+### Step 3: Run Terraform Commands
+
+#### Initialize Terraform
 
 ```bash
 terraform init
 ```
 
-- plan the terradorm resources
+#### Plan Terraform Resources
 
 ```bash
 terraform plan
 ```
 
-- create a terradorm resources
+#### Create Terraform Resources
 
 ```bash
 terraform apply
 ```
 
-- After peforming the project at the end dont forget to destroy terraform resources
+#### If You created tfvars file
+
+```bash
+terraform apply -var-file=< Path of tfvars file >
+```
+
+### Step 4: Destroy Resources (After Project Completion)
 
 ```bash
 terraform destroy
@@ -182,7 +217,7 @@ cd /opt/sonar/bin/linux-x86-64
 ### Srtep 3:- Take Access Of Sonarqube
 
 ```bash
-http://<public IP of sonarqube instance>:9000
+http://< public IP of sonarqube instance >:9000
 ```
 
 ### Srtep 4:- Login to Sonarqube
@@ -627,4 +662,77 @@ apt install nodejs npm -y
 
 ### Step 2:- Start Creating Pipeline
 
+- S3 Bucket Should Have Public Access
+
 #### 2.1:- Pull Stage
+
+```bash
+pipeline{
+    agent any
+    stages{
+        stage("Pull"){
+            steps{
+                git 'https://github.com/PranavKotawar2001/three-tear-project.git'
+            }
+        }
+    }
+}
+```
+
+#### 2.2:- Build Stage
+
+```bash
+pipeline{
+    agent any
+    stages{
+        stage("Pull"){
+            steps{
+                git 'https://github.com/PranavKotawar2001/three-tear-project.git'
+            }
+        }
+        stage("Build"){
+            steps{
+                sh '''cd frontend
+                    npm install
+                    npm run build'''
+            }
+        }
+    }
+}
+```
+
+#### 2.3:- Move To S3 Stage
+
+```bash
+pipeline{
+    agent any
+    stages{
+        stage("Pull"){
+            steps{
+                git 'https://github.com/PranavKotawar2001/three-tear-project.git'
+            }
+        }
+        stage("Build"){
+            steps{
+                sh '''cd frontend
+                    npm install
+                    npm run build'''
+            }
+        }
+        stage("Move-To-S3"){
+            steps{
+                sh '''cd frontend
+                   aws s3 sync dist/ s3://pranav-backend-bucket-00000000/'''
+            }
+        }
+    }
+}
+```
+
+#### 2.4:- Take Access
+
+**_ Go to S3 bucket and take a hit the URL _**
+
+## End Of Project
+
+---

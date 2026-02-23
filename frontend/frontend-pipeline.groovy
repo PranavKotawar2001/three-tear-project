@@ -1,6 +1,6 @@
 pipeline{
     agent any
-    atages{
+    stages{
         stage("Pull"){
             steps{
                 git 'https://github.com/PranavKotawar2001/three-tear-project.git'
@@ -9,8 +9,8 @@ pipeline{
         stage("Build"){
             steps{
                 sh '''cd frontend
-                   npm install
-                   npm run build'''
+                    npm install
+                    npm run build'''
             }
         }
         stage("Move-To-S3"){
