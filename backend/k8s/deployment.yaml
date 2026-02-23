@@ -14,7 +14,7 @@ spec:
       labels:
         app: join-resources
     spec:
-      containets:
+      containers:
         - name: backend
           image: pranavsudhirkotawar/backend:latest
           imagePullPolicy: Always
