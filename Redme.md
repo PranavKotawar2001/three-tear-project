@@ -476,6 +476,11 @@ pipeline{
 pipeline{
     agent any
     stages{
+        stage('Pull'){
+            steps{
+                git 'https://github.com/PranavKotawar2001/three-tear-project.git'
+            }
+        }
          stage('Build'){
             steps{
                 sh '''cd backend
@@ -493,6 +498,17 @@ pipeline{
 pipeline{
     agent any
     stages{
+        stage('Pull'){
+            steps{
+                git 'https://github.com/PranavKotawar2001/three-tear-project.git'
+            }
+        }
+         stage('Build'){
+            steps{
+                sh '''cd backend
+                   mvn clean package -DskipTests'''
+            }
+        }
          stage('Test'){
             steps{
                 withSonarQubeEnv(installationName: 'Sonar', credentialsId: 'Sonar-secret') {
@@ -511,12 +527,31 @@ pipeline{
 pipeline{
     agent any
     stages{
+        stage('Pull'){
+            steps{
+                git 'https://github.com/PranavKotawar2001/three-tear-project.git'
+            }
+        }
+         stage('Build'){
+            steps{
+                sh '''cd backend
+                   mvn clean package -DskipTests'''
+            }
+        }
+         stage('Test'){
+            steps{
+                withSonarQubeEnv(installationName: 'Sonar', credentialsId: 'Sonar-secret') {
+                sh '''cd backend
+                    mvn sonar:sonar -Dsonar.projectKey=backend'''
+                }
+            }
+        }
         stage('Docker-Image-Build'){
             steps{
                 sh '''cd backend
-                   docker build -t pranavsudhirkotawar/backend:latest .
-                   docker push pranavsudhirkotawar/backend:latest
-                   docker rmi pranavsudhirkotawar/backend:latest'''
+                   docker build -t < Image name as per docker hub> .
+                   docker push < Image name as per docker hub>
+                   docker rmi < Image name as per docker hub>'''
             }
         }
     }
@@ -528,3 +563,52 @@ pipeline{
 - push to github
 
 #### 9.5:- Deploy Stage
+
+```bash
+pipeline{
+    agent any
+    stages{
+        stage('Pull'){
+            steps{
+                git 'https://github.com/PranavKotawar2001/three-tear-project.git'
+            }
+        }
+         stage('Build'){
+            steps{
+                sh '''cd backend
+                   mvn clean package -DskipTests'''
+            }
+        }
+         stage('Test'){
+            steps{
+                withSonarQubeEnv(installationName: 'Sonar', credentialsId: 'Sonar-secret') {
+                sh '''cd backend
+                    mvn sonar:sonar -Dsonar.projectKey=backend'''
+                }
+            }
+        }
+        stage('Docker-Image-Build'){
+            steps{
+                sh '''cd backend
+                   docker build -t < Image name as per docker hub> .
+                   docker push < Image name as per docker hub>
+                   docker rmi < Image name as per docker hub>'''
+            }
+        }
+        stage('Deploy'){
+            steps{
+                sh '''cd backend
+                kubectl apply -f k8s/'''
+            }
+        }
+    }
+}
+```
+
+#### 9.6:- Take backend End Point
+
+```bash
+kubectl get svc
+```
+
+- Insert the service endpoint in frontend > **_ .env _** file
