@@ -13,7 +13,7 @@
 
 ## take ssh a terraform instance with attach terraform IAM role
 
-Step 1:- Update a instance and install terraform
+### Step 1:- Update a instance and install terraform
 
 - update instance
 
@@ -612,3 +612,19 @@ kubectl get svc
 ```
 
 - Insert the service endpoint in frontend > **_ .env _** file
+
+## End of Backend And Database
+
+---
+
+## Frontend Part
+
+### Step 1:- Install Nodejs
+
+```bash
+apt install nodejs npm -y
+```
+
+### Step 2:- Start Creating Pipeline
+
+#### 2.1:- Pull Stage
