@@ -454,3 +454,77 @@ show databases;
 - click on New Item >
 - Give Pipeline Name >
 - Select Pipeline and Click on OK
+
+#### 9.1:- Pull Stage
+
+```bash
+pipeline{
+    agent any
+    stages{
+        stage('Pull'){
+            steps{
+                git 'https://github.com/PranavKotawar2001/three-tear-project.git'
+            }
+        }
+    }
+}
+```
+
+#### 9.2:- Build Stage
+
+```bash
+pipeline{
+    agent any
+    stages{
+         stage('Build'){
+            steps{
+                sh '''cd backend
+                   mvn clean package -DskipTests'''
+            }
+        }
+
+    }
+}
+```
+
+#### 9.3:- Test Stage
+
+```bash
+pipeline{
+    agent any
+    stages{
+         stage('Test'){
+            steps{
+                withSonarQubeEnv(installationName: 'Sonar', credentialsId: 'Sonar-secret') {
+                sh '''cd backend
+                    mvn sonar:sonar -Dsonar.projectKey=backend'''
+                }
+            }
+        }
+    }
+}
+```
+
+#### 9.4:- Image Build Stage
+
+```bash
+pipeline{
+    agent any
+    stages{
+        stage('Docker-Image-Build'){
+            steps{
+                sh '''cd backend
+                   docker build -t pranavsudhirkotawar/backend:latest .
+                   docker push pranavsudhirkotawar/backend:latest
+                   docker rmi pranavsudhirkotawar/backend:latest'''
+            }
+        }
+    }
+}
+```
+
+- Update the Deployment.yaml file
+- Add image name inside Deployment.yaml
+- push to github
+
+#### 9.5:- Deploy Stage

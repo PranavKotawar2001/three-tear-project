@@ -14,7 +14,7 @@ spec:
       labels: join-resources
     spec:
       - name: backend
-        image:
+        image: pranavsudhirkotawar/backend:latest
         imagePullPolicy: Always
         ports:
           - containerPort: 8080
