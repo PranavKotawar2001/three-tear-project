@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       labels:
-      app: join-resources
+        app: join-resources
     spec:
       - name: backend
         image: pranavsudhirkotawar/backend:latest

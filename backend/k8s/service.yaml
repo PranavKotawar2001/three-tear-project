@@ -5,11 +5,11 @@ metadata:
   labels:
     app: join-resources
 spec:
-  selector:
-    app: join-resources
   type: LoadBalancer
   ports:
-    - name: backend
-      protocol: TCP
-      port: 8080
+    - port: 80
       targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: join-resources
