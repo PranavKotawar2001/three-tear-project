@@ -28,7 +28,7 @@ pipeline{
                    docker rmi pranavsudhirkotawar/backend:latest''' 
             }
         }
-        stage('Build'){
+        stage('Deploy'){
             steps{
                 sh '''cd backend
                 kubectl apply -f k8s/'''  
